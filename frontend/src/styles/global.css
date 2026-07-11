@@ -1,0 +1,12 @@
+.image_container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+img {
+    height: 200px;
+    width: 200px;
+    object-fit: cover;
+    box-shadow: 2px 2px 10px black;
+}
