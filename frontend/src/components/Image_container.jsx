@@ -15,22 +15,37 @@ const Image_container = ({ searchResults }) => {
                 throw new Error(response.status)
             }
             const result = await response.json();
-            console.log(result)
             setFilenames(result);
         }
         fetchFilenames();
     }, [searchResults]);
-
     const imagesToDisplay = searchResults !== null ? searchResults : filenames;
 
+    // Group images by cluster_id
+    const groupedImages = imagesToDisplay.reduce((groups, imgObj) => {
+        const cluster = imgObj.cluster_id;
+        if (!groups[cluster]) {
+            groups[cluster] = [];
+        }
+        groups[cluster].push(imgObj);
+        return groups;
+    }, {});
+
     return (
-        <div className="image_container">
-            {imagesToDisplay.length > 0 ? (
-                imagesToDisplay.map((filename) => (
-                    <img src={`${HOST}:${PORT}/image/${filename}`} key={filename} alt={filename} />
+        <div className="gallery-wrapper" style={{ display: "flex", flexDirection: "column", gap: "30px", padding: "20px" }}>
+            {Object.keys(groupedImages).length > 0 ? (
+                Object.entries(groupedImages).map(([clusterId, images]) => (
+                    <div key={clusterId} className="cluster-section">
+                        <h2>{clusterId === "-1" ? "Noise / Unclustered" : `Cluster ${clusterId}`}</h2>
+                        <div className="image_container" style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                            {images.map((imgObj) => (
+                                <img src={`${HOST}:${PORT}/image/${imgObj.name}`} key={imgObj.id} alt={imgObj.name} style={{ width: "200px", height: "auto" }} />
+                            ))}
+                        </div>
+                    </div>
                 ))
             ) : (
-                <p>{searchResults !== null ? "No results found" : "Loading images"}</p>
+                <p>{searchResults !== null ? "No results found" : "Loading images..."}</p>
             )}
         </div>
     )

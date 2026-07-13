@@ -10,7 +10,6 @@ const Searchbar = ({ onSearchResults }) => {
             onSearchResults(null);
             return;
         }
-
         const searchResult = async (query) => {
             try {
                 const response = await fetch(BACKEND_URL + `/image/search/${query}`);
@@ -18,6 +17,7 @@ const Searchbar = ({ onSearchResults }) => {
                     throw new Error(response.status)
                 }
                 const result = await response.json();
+                console.log(result)
                 onSearchResults(result);
             } catch (err) {
                 console.error("Search failed", err);

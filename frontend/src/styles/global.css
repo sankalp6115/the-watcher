@@ -5,8 +5,12 @@
 }
 
 img {
-    height: 200px;
-    width: 200px;
+    --dimension: 200px;
+    min-height: var(--dimension);
+    max-height: var(--dimension);
+
+    min-width: var(--dimension);
+    max-width: var(--dimension);
     object-fit: cover;
     box-shadow: 2px 2px 10px black;
 }
