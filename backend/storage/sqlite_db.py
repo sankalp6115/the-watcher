@@ -148,16 +148,12 @@ def search_text(keyword, limit=10):
             "cleaned_text": row[3],
             "cluster_id": row[4]
         })
-        
     return formatted_results
 
 def search_text_with_id(img_id):
-    """
-        Pass id and get image
-    """
+    """Pass id and get image"""
     conn = get_connection()
     cursor = conn.cursor()
-
     query = "SELECT id, name, path, cleaned_text, cluster_id FROM images WHERE id=?"
     cursor.execute(query, (img_id,))
     result = cursor.fetchall()

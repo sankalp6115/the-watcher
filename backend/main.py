@@ -48,12 +48,14 @@ def image(filename: str):
     file_path = os.path.join(IMG_DIR, filename)
     return FileResponse(file_path)
 
+# Takes string query and uses text search with fts5
 @app.get("/image/search/{query}")
 def search_images(query: str):
     results = search_text(query, 20)
     return results
 
-@app.get("/images/similar/{img_id}")
+# Takes id of image and returns image
+@app.get("/image/search_id/{img_id}")
 def search_similar_images(img_id: str):
     return search_text_with_id(img_id)
 

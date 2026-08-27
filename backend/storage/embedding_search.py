@@ -37,6 +37,20 @@ for image_id, db_embedding in embeddings.items():
     cosine_similarities.append((similarity, image_id))
 
 cosine_similarities.sort(key=lambda x: x[0], reverse=True)
-for i in range(min(10, len(cosine_similarities))):
+names = []
+
+for i in range(min(5, len(cosine_similarities))):
     score, img_id = cosine_similarities[i]
-    print(f"Score: {score:.4f} | Image ID: {img_id}")
+    
+    response = requests.get(f"http://localhost:1000/image/search_id/{img_id}")
+    # image_data = response.json()[0]['name']
+    image_data = {
+        "name": response.json()[0]['name'],
+        "similarity_score": score,
+        "cluster_id": response.json()[0]['cluster_id'],
+    }
+    # image_data['similarity_score'] = score
+    names.append(image_data)
+
+import json
+print(json.dumps(names, indent=4))
