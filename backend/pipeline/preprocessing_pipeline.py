@@ -64,7 +64,7 @@ def remove_punctuation(sentence):
     if not isinstance(sentence, str):
         return ""
     return sentence.translate(PUNCT_TRANSLATION_TABLE)
-# Normalize words by removing too many continuosly repeating characters like heyyyy -> hey
+# heyyy -> hey
 def normalize_word(word, max_repeat=2):
     if not word:
         return word
@@ -80,7 +80,6 @@ def normalize_word(word, max_repeat=2):
             result.append(word[i])
     return "".join(result)        
 
-# Uses normalization to check all words of sentence
 def repeat_character_filter(sentence):
     if not isinstance(sentence, str):
         return ""

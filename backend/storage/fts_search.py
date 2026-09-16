@@ -8,16 +8,6 @@ get_connection()
 search_query = input("Enter your query: ")
 result = search_text(search_query, 20)
 
-# if result:
-#     for i in range(len(result)):
-#         path = result[i]["path"]
-#         img = Image.open(path)
-#         img.show()
-
-# print(result)
-# def fts_search(query):
-
-
 for i in range(len(result)):
     print(result[i]["path"])
 print(len(result))
