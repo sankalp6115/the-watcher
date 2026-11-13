@@ -2,13 +2,13 @@ import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import torch
 import open_clip
-import numpy as np
-from PIL import Image   
+from PIL import Image
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import uvicorn
+
+from models.models import TextRequest, ImageRequest
 
 app = FastAPI(title="Watcher Embedding Server")
 
@@ -35,12 +35,6 @@ clip_model = clip_model.to(device)
 clip_model.eval()
 
 print("Models loaded successfully!")
-
-class TextRequest(BaseModel):
-    text: str
-
-class ImageRequest(BaseModel):
-    path: str
 
 @app.post("/embed-text")
 def embed_text(req: TextRequest):

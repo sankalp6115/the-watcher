@@ -1,18 +1,22 @@
-from storage.sqlite_db import get_connection, search_text, insert_image_record, get_cluster_with_image, search_text_with_id
 import sqlite3
 
 import subprocess
 import os
 import uvicorn
 import json
+import shutil
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import FileResponse
-from pipeline.ingestion_pipeline import ingestion_to_db
-import shutil
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from models.IngestRequest import IngestRequest
+from dotenv import load_dotenv
+from pathlib import Path
 
+from pipeline.ingestion_pipeline import ingestion_to_db
+from storage.sqlite_db import get_connection, search_text, insert_image_record, get_cluster_with_image, search_text_with_id
+from models.models import IngestRequest
+
+ENV_FILE = Path(__file__).resolve().parent / "settings" / ".env"
+load_dotenv(ENV_FILE)
 
 app = FastAPI()
 
@@ -24,9 +28,8 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-
-IMG_DIR = "/Users/sankalpomar/Pictures/Screenshots"
-VALID_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp')
+IMG_DIR = os.getenv("IMG_DIR")
+VALID_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp', '.avif')
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "watcher.db")
 get_connection()
@@ -78,4 +81,4 @@ def images_with_clusters():
     return result
 
 if __name__ == "__main__":
-    uvicorn.run("main:app",host="0.0.0.0",port=1000,reload=True)
+    uvicorn.run("main:app",host="0.0.0.0",port=1000)

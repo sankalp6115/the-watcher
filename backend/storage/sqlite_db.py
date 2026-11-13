@@ -79,26 +79,25 @@ def get_existing_paths():
     conn.close()
     return paths
 
-def insert_image_record(record_dict):
+def insert_image_records(records_list):
     """
-    Inserts a single image record into the database.
-    record_dict should contain the metadata and cleaned_text from the ingestion pipeline.
+    Inserts multiple image records into the database in a single transaction.
     """
+    if not records_list:
+        return 0
+
     conn = get_connection()
     cursor = conn.cursor()
-    
-    try:
+
+    rows = []
+    for record_dict in records_list:
         meta = record_dict["metadata"]
         cleaned_text = record_dict.get("cleaned_text", "")
-        
         text_embedding_bytes = record_dict.get("text_embedding")
         image_embedding_bytes = record_dict.get("image_embedding")
         cluster_id = record_dict.get("cluster_id")
-        
-        cursor.execute("""
-        INSERT OR REPLACE INTO images (id, name, extension, size_bytes, modified_time, path, cleaned_text, text_embedding, image_embedding, cluster_id, text_embedding_model, image_embedding_model)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
+
+        rows.append((
             meta["id"],
             meta["name"],
             meta["extension"],
@@ -112,12 +111,27 @@ def insert_image_record(record_dict):
             text_embedding_model,
             image_embedding_model
         ))
-        
+
+    try:
+        cursor.executemany("""
+        INSERT OR REPLACE INTO images (id, name, extension, size_bytes, modified_time, path, cleaned_text, text_embedding, image_embedding, cluster_id, text_embedding_model, image_embedding_model)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, rows)
         conn.commit()
+        return len(rows)
     except Exception as e:
-        print(f"Error inserting record for {meta.get('path')}: {e}")
+        conn.rollback()
+        print(f"Error batch inserting records: {e}")
+        return 0
     finally:
         conn.close()
+
+def insert_image_record(record_dict):
+    """
+    Inserts a single image record into the database.
+    record_dict should contain the metadata and cleaned_text from the ingestion pipeline.
+    """
+    insert_image_records([record_dict])
 
 def search_text(keyword, limit=10):
     """

@@ -1,8 +1,14 @@
+import os
+from pathlib import Path
 import torch
 import open_clip
 import numpy as np
 from PIL import Image
 from data_exchange import image_iterator
+from dotenv import load_dotenv
+
+ENV_FILE = Path(__file__).resolve().parent.parent / "settings" / ".env"
+load_dotenv(ENV_FILE)
 
 def load_image(path):
     with Image.open(path) as img:
@@ -10,7 +16,7 @@ def load_image(path):
 
 # ---- config ----
 BATCH_SIZE = 32
-image_path = "/Users/sankalpomar/Documents/warehouse/ss-classifier"
+IMG_DIR = os.getenv("IMG_DIR")
 
 # ---- device ----
 device = "mps" if torch.backends.mps.is_available() else "cpu"
