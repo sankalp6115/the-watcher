@@ -2,8 +2,7 @@ import os
 from pathlib import Path
 import sys
 import numpy as np
-# import hdbscan
-from sklearn.cluster import DBSCAN, HDBSCAN
+from sklearn.cluster import HDBSCAN
 from sklearn.metrics import pairwise_distances
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -11,9 +10,11 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BACKEND_DIR))
 
 from storage.sqlite_db import get_connection, get_img_embedding, get_text_embedding, update_cluster_ids
-IMG_WEIGHT = 0.50
-TEXT_WEIGHT = 0.50
-DISTANCE_THRESHOLD = 0.42
+from settings.settings import settings
+
+IMG_WEIGHT = settings.image_embedding_weight
+TEXT_WEIGHT = settings.text_embedding_weight
+DISTANCE_THRESHOLD = settings.clustering_distance_threshold
 
 img_result = get_img_embedding()
 text_result = get_text_embedding()
@@ -38,10 +39,9 @@ for row in img_result:
 
 print(f"Total valid image-text pairs: {len(image_ids)}")
 
-# metric='minkowski'
-metric = 'cosine'
-dist_img = pairwise_distances(img_embeddings_list, metric=metric)
-dist_text = pairwise_distances(text_embeddings_list, metric=metric)
+METRIC = settings.clustering_distance_metric
+dist_img = pairwise_distances(img_embeddings_list, metric=METRIC)
+dist_text = pairwise_distances(text_embeddings_list, metric=METRIC)
 
 distance_matrix = (IMG_WEIGHT * dist_img) + (TEXT_WEIGHT * dist_text)
 
@@ -112,7 +112,6 @@ for cluster_id, images in grouped.items():
         print("Sample Images:", images[:5])
 
     for img_id in images:
-        # Save mapping as (cluster_id, image_id) for the SQL UPDATE
         cluster_mapping.append((int(cluster_id), img_id))
 
 print("\n--- Updating Database ---")

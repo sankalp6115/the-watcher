@@ -3,11 +3,17 @@ import pandas as pd
 import regex
 import string
 import spacy
+from pathlib import Path
 # from sentence_transformers import SentenceTransformer
+ASSET_DIR = Path(__file__).parent.parent / "assets"
 
 # Symspell init
 sym_spell = SymSpell(max_dictionary_edit_distance=1, prefix_length=7)
-sym_spell.load_dictionary("/Users/sankalpomar/Documents/the-watcher/assets/frequency_dictionary_en_82_765.txt", 0, 1)
+dict_path = ASSET_DIR / "frequency_dictionary_en_82_765.txt"
+if not dict_path.exists():
+    import symspellpy
+    dict_path = Path(symspellpy.__file__).parent / "frequency_dictionary_en_82_765.txt"
+sym_spell.load_dictionary(str(dict_path), 0, 1)
 
 # Regex compilation
 EMOJI_PATTERN = regex.compile(r'\p{Emoji}(?<!\d)')

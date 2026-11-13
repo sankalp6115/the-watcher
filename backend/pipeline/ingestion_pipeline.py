@@ -15,13 +15,13 @@ from preprocessing_pipeline import cleaning_pipeline
 
 def run_text_pipeline(image_path):
     # OCR -> Cleaning -> Text Embedding
-    print("OCR Started")
+    # print("OCR Started")
     ocr_text = ocr(image_path)
 
-    print("Cleaning started")
+    # print("Cleaning started")
     cleaned_text = cleaning_pipeline(ocr_text)
 
-    print("Text to Embedding started")
+    # print("Text to Embedding started")
     response_text = requests.post("http://localhost:8000/embed-text", json={"text": cleaned_text})
     response_text.raise_for_status()
     text_embedding = np.array(response_text.json()["embedding"]).reshape(1, -1)
@@ -30,7 +30,7 @@ def run_text_pipeline(image_path):
 
 def run_image_pipeline(image_path):
     # Image Embedding
-    print("Image to Embedding started")
+    # print("Image to Embedding started")
     response_img = requests.post("http://localhost:8000/embed-image", json={"path": image_path})
     response_img.raise_for_status()
     img_embedding = np.array(response_img.json()["embedding"]).reshape(1, -1)
@@ -39,7 +39,7 @@ def run_image_pipeline(image_path):
     return img_embedding_bytes
 
 def ingestion_to_db(image):
-    print("Extracting metadata")
+    # print("Extracting metadata")
     metadata = get_file_metadata(image)
     with ThreadPoolExecutor(max_workers=2) as executor:
         future_text = executor.submit(run_text_pipeline, image)

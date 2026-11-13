@@ -5,11 +5,20 @@ import open_clip
 import numpy as np
 from PIL import Image   
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 import uvicorn
 
 app = FastAPI(title="Watcher Embedding Server")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 device = "mps" if torch.backends.mps.is_available() else "cpu"
 if torch.cuda.is_available():
